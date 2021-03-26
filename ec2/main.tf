@@ -46,3 +46,21 @@ resource "aws_instance" "minecraft-instance" {
     when    = "destroy"
   }
 }
+
+resource "null_resource" "null" {
+  provisioner "file" {
+    source   = "mods/"
+    destination    = "~/opt/minecraft/ForgeServer/"
+  }
+
+  provisioner "local-exec" {
+    command = "/etc/init/startServer.sh"
+  }
+
+  connection {
+    type     = "ssh"
+    user     = "ubuntu"
+    host     = aws_instance.minecraft-instance.public_ip
+    private_key = file("~/.ssh/minecraft.pem")
+  }
+}
